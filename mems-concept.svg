@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-labelledby="title desc">
+<title id="title">Tethered MEMS mirror</title>
+<desc id="desc">Conceptual disk and curved tethers inspired by the 2014 conference presentation. Not a fabrication drawing or to scale.</desc>
+<defs>
+ <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4f5f6"/><stop offset=".4" stop-color="#c1c5c9"/><stop offset=".65" stop-color="#fafafa"/><stop offset="1" stop-color="#8c9299"/></linearGradient>
+ <radialGradient id="mirror"><stop stop-color="#fff"/><stop offset=".65" stop-color="#e5e7e9"/><stop offset="1" stop-color="#a6adb4"/></radialGradient>
+ <path id="tether" d="M-17-63 Q-52-115-24-150 L4-150 Q-18-114 17-63Z"/>
+</defs>
+<ellipse cx="300" cy="275" rx="150" ry="22" fill="#eef0f2"/>
+<g transform="translate(300 199) rotate(-18) scale(1 .65)">
+ <circle r="172" fill="none" stroke="#e5e7ea" stroke-width="14"/>
+ <g fill="url(#metal)" stroke="#969da5" stroke-width="1.1">
+ <use href="#tether"/><use href="#tether" transform="rotate(72)"/><use href="#tether" transform="rotate(144)"/><use href="#tether" transform="rotate(216)"/><use href="#tether" transform="rotate(288)"/>
+ <circle r="72" fill="url(#mirror)"/>
+ </g>
+ <circle r="63" fill="none" stroke="#fff" stroke-opacity=".7"/>
+</g>
+</svg>
