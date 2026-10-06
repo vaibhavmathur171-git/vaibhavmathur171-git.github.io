@@ -399,3 +399,6 @@ html.slides body { overflow-x: hidden; }
   .reel figure.on img { animation: none; }
   .bench figcaption .dot { animation: none; }
 }
+
+/* Contributions slide: shorter media strip so the whole story fits one screen */
+.xcard > img, .xcard > svg.xart { aspect-ratio: 16 / 7; object-fit: cover; object-position: center; background: #f5f7fa; }
