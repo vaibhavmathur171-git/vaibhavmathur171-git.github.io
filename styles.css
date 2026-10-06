@@ -402,3 +402,10 @@ html.slides body { overflow-x: hidden; }
 
 /* Contributions slide: shorter media strip so the whole story fits one screen */
 .xcard > img, .xcard > svg.xart { aspect-ratio: 16 / 7; object-fit: cover; object-position: center; background: #f5f7fa; }
+
+/* AI CAD slide: why / learned / contributions */
+.why { display: grid; gap: 8px; }
+.cad-copy .flow li { font-size: 15.5px; line-height: 1.55; }
+.learned { margin: 0; padding: 12px 16px; background: var(--paper); border-left: 2px solid var(--laser); border-radius: 0 8px 8px 0; color: var(--ink); }
+.contrib { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.contrib .label { margin-right: 4px; }
