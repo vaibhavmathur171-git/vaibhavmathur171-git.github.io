@@ -328,6 +328,13 @@ onScroll();
     hud.textContent = (mode === 'spatial' ? 'Spatial' : 'Global') + ' · ' + range.value + '% dimming' +
       (mode === 'global' && d > .4 ? ' · the whole world gets dark' : '');
     bS.setAttribute('aria-pressed', mode === 'spatial'); bG.setAttribute('aria-pressed', mode === 'global');
+    // the outside view: the same headset, seen by people around you
+    root.style.setProperty('--g', mode === 'global' ? (d * .8).toFixed(2) : 0);   // same as the inside view
+    root.style.setProperty('--s', mode === 'spatial' ? (d * .92).toFixed(2) : 0);
+    const x = root.querySelector('#dimx');
+    if (x) x.innerHTML = mode === 'spatial'
+      ? '<b>Spatial:</b> only the area behind the virtual image darkens. The rest of the world stays bright.'
+      : '<b>Global:</b> the whole lens darkens evenly, like sunglasses. Everything gets darker.';
   }
   range.addEventListener('input', render);
   bS.addEventListener('click', () => { mode = 'spatial'; render(); });
@@ -344,7 +351,7 @@ onScroll();
 })();
 
 /* ---------- 4. Old deep links ---------- */
-const aliases = { 'ai-physical-world': 'ai', 'neural-surrogates': 'ai', 'cad-visual-search': 'ai', 'hardware-manufacturing': 'ai', 'ar-vr-glasses': 'ar', 'mems-medical-imaging': 'mems', 'phd-mems-research': 'phd', 'beyond-work': 'interests', 'optical-tweezers': 'iisc', 'journey': 'top' };
+const aliases = { 'ai-physical-world': 'ai', 'neural-surrogates': 'ai-next', 'cad-visual-search': 'ai', 'hardware-manufacturing': 'ai-next', 'ai-featured': 'ai', 'ai-projects': 'ai-next', 'ar-vr-glasses': 'ar-more', 'ar-dimming': 'ar', 'mems-medical-imaging': 'mems', 'phd-mems-research': 'roots', 'phd': 'roots', 'iisc': 'roots', 'beyond-work': 'interests', 'optical-tweezers': 'roots', 'overview': 'thread', 'journey': 'thread' };
 const h = location.hash.slice(1);
 if (aliases[h]) document.getElementById(aliases[h])?.scrollIntoView();
 
@@ -471,13 +478,14 @@ if (aliases[h]) document.getElementById(aliases[h])?.scrollIntoView();
     addEventListener('wheel', e => {
       if (!html.classList.contains('slides')) return;                              // normal scrolling on small windows
       if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;           // pinch-zoom, sideways scroll
-      if (e.target.closest && e.target.closest('.stops')) return;
+      if (e.target.closest && e.target.closest('.stops, .drawer')) return;
+      if (html.classList.contains('drawer-open')) return;
       e.preventDefault();
       const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1);   // Firefox reports lines
       onWheel(dy);
     }, { passive: false });
     addEventListener('keydown', e => {
-      if (!html.classList.contains('slides')) return;
+      if (!html.classList.contains('slides') || html.classList.contains('drawer-open')) return;
       if (e.target.closest('input, textarea, select, video, [contenteditable]') || e.metaKey || e.ctrlKey || e.altKey) return;
       const down = ['ArrowDown', 'PageDown', ' '].includes(e.key) && !e.shiftKey;
       const up = ['ArrowUp', 'PageUp'].includes(e.key) || (e.key === ' ' && e.shiftKey);
@@ -523,4 +531,41 @@ if (aliases[h]) document.getElementById(aliases[h])?.scrollIntoView();
     else if (e.boundingClientRect.top > 0) e.target.classList.remove('arrive');   // replay when it comes back from below
   }), { threshold: .12 });
   secs.forEach(s => io.observe(s));
+})();
+
+/* ---------- 6. "Technical details" drawer ----------
+   Each chapter keeps its engineering depth in a <template class="notes">.
+   The button next to it opens that content in one shared side drawer. */
+(() => {
+  const drawer = document.getElementById('drawer'); if (!drawer) return;
+  const body = drawer.querySelector('.drawer-body'), title = drawer.querySelector('#drawer-t'), x = drawer.querySelector('.x');
+  let opener = null;
+  const close = () => {
+    drawer.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true');
+    document.documentElement.classList.remove('drawer-open');
+    opener?.focus({ preventScroll: true });
+  };
+  document.querySelectorAll('.deep').forEach(btn => {
+    const tpl = btn.parentElement.querySelector(':scope > template.notes') || btn.nextElementSibling;
+    if (!tpl || tpl.tagName !== 'TEMPLATE') return;
+    btn.addEventListener('click', () => {
+      opener = btn;
+      title.textContent = tpl.dataset.title || 'Technical details';
+      body.replaceChildren(tpl.content.cloneNode(true));
+      body.scrollTop = 0;
+      drawer.classList.add('open'); drawer.setAttribute('aria-hidden', 'false');
+      document.documentElement.classList.add('drawer-open');
+      x.focus({ preventScroll: true });
+      if (window.goatcounter?.count) window.goatcounter.count({ path: 'details-' + (btn.closest('section')?.id || ''), title: 'Opened details', event: true });
+    });
+  });
+  x.addEventListener('click', close);
+  drawer.addEventListener('click', e => { if (e.target === drawer) close(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && drawer.classList.contains('open')) close(); });
+})();
+
+/* Light up the thread's laser line when it comes into view */
+(() => {
+  const t = document.querySelector('.thread'); if (!t) return;
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) t.classList.add('lit'); }, { threshold: .4 }).observe(t);
 })();
