@@ -266,27 +266,42 @@ document.querySelectorAll('.reel').forEach(reel => {
 
 /* ---------- 2. Timeline rail: active chapter + scroll progress ----------
    Each slide carries data-nav="ai|ar|mems|…"; the matching menu stop lights up. */
-const links = [...document.querySelectorAll('.stops a, .rail .btn')];
+const links = [...document.querySelectorAll('.stops .ch, .rail .btn')];
+const chapters = [...document.querySelectorAll('.stops li')];
 const slidesAll = [...document.querySelectorAll('.slide')];
-const prog = document.getElementById('prog');
-let currentNav = null;
+let currentId = null;
 function onScroll() {
   const y = window.scrollY, max = document.documentElement.scrollHeight - innerHeight;
-  if (prog) prog.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
   const probe = y + innerHeight * 0.45;
   let active = null;
   for (const s of slidesAll) if (s.getBoundingClientRect().top + y <= probe) active = s;
   if (y >= max - 4) active = slidesAll[slidesAll.length - 1];
+  const id = active ? active.id : '';
+  if (id === currentId) return;
+  currentId = id;
   const nav = active ? active.dataset.nav : '';
-  if (nav === currentNav) return;
-  currentNav = nav;
+  const ai = slidesAll.indexOf(active);
   links.forEach(a => {
     const on = !!nav && a.getAttribute('href') === '#' + nav;
     a.classList.toggle('on', on);
     if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
-    if (on && a.closest('.stops')) {   // keep the active stop visible when the rail scrolls (phones)
-      const rail = a.closest('.stops');
-      rail.scrollTo({ left: a.parentElement.offsetLeft - 16, behavior: 'smooth' });
+  });
+  // The timeline: chapters before this one are filled, this one fills up to the current slide.
+  chapters.forEach(li => {
+    const ticks = [...li.querySelectorAll('.track a')], n = ticks.length;
+    const idx = ticks.map(t => slidesAll.indexOf(document.getElementById(t.getAttribute('href').slice(1))));
+    const k = ticks.findIndex(t => t.getAttribute('href') === '#' + id);
+    const past = ai >= 0 && ai > idx[n - 1];
+    const on = k >= 0;
+    li.classList.toggle('on', on);
+    li.classList.toggle('done', past);
+    ticks.forEach((t, i) => { t.classList.toggle('on', i === k); t.classList.toggle('past', past || (on && i < k)); });
+    li.querySelector('.fill').style.width = past ? '100%' : on ? (100 * k / n) + '%' : '0%';
+    const proj = li.querySelector('.proj'), text = on ? ticks[k].dataset.name : proj.dataset.sum;
+    if (proj.textContent !== text) { proj.textContent = text; proj.classList.remove('swap'); void proj.offsetWidth; proj.classList.add('swap'); }
+    if (on) {   // keep the active chapter visible when the rail scrolls sideways (phones)
+      const rail = li.closest('.stops');
+      if (rail.scrollWidth > rail.clientWidth + 2) rail.scrollTo({ left: li.offsetLeft - 16, behavior: 'smooth' });
     }
   });
 }

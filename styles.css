@@ -25,7 +25,7 @@
 
   --gutter: clamp(16px, 4vw, 48px);
   --max: 1160px;
-  --rail-h: 62px;
+  --rail-h: 70px;
   --r: 12px;
   --spring: cubic-bezier(.34, 1.45, .55, 1);   /* fallback; real spring curve below */
   color-scheme: light;
@@ -70,24 +70,31 @@ h4 { font-size: 18px; line-height: 1.35; font-weight: 600; letter-spacing: 0; }
 
 /* ---------- Timeline rail = navigation ---------- */
 .rail { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: rgba(255,255,255,.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.rail .wrap { max-width: 1400px; }
 .rail-in { display: flex; align-items: center; gap: 24px; height: var(--rail-h); }
 .brand { font-weight: 650; font-size: 17px; color: var(--ink); text-decoration: none; white-space: nowrap; letter-spacing: -.01em; }
-.stops { flex: 1; display: flex; list-style: none; margin: 0; padding: 0; overflow-x: auto; scrollbar-width: none; }
+.stops { flex: 1; display: flex; gap: 0; list-style: none; margin: 0 0 0 -8px; padding: 6px 0 6px 8px; overflow-x: auto; scrollbar-width: none; }
 .stops::-webkit-scrollbar { display: none; }
-.stops li { flex: 1 0 auto; position: relative; }
-.stops li::before { content: ""; position: absolute; left: 0; right: 0; top: 4px; height: 1px; background: var(--line); }
-.stops a { position: relative; display: flex; flex-direction: column-reverse; padding: 14px 18px 0 0; color: var(--text); text-decoration: none; font-size: 14px; font-weight: 550; line-height: 1.2; white-space: nowrap; }
-.stops a::before { content: ""; position: absolute; left: 0; top: 0; width: 9px; height: 9px; border-radius: 50%; background: #fff; border: 1.5px solid #b9c1cd; transition: all .25s; }
-.stops .yr { font-family: var(--mono); font-size: 10.5px; color: var(--muted); margin-top: 2px; }
-.stops a:hover { color: var(--ink); }
-.stops a:hover::before { border-color: var(--ink); }
-.stops a.on { color: var(--ink); }
-.stops a.on::before { background: var(--laser); border-color: var(--laser); box-shadow: 0 0 0 3px #ffe1db; }
-.stops a.on .yr { color: var(--laser); }
-.rail .btn { padding: 8px 14px; font-size: 14px; }
-.rail .btn.on { background: var(--ink); color: #fff; }
-.progress { height: 2px; }
-.progress span { display: block; height: 100%; width: 0; background: var(--laser); }
+/* Each chapter is a stretch of one timeline: title + years, a track with one tick per slide, and the project you're on. */
+.stops li { flex: calc(var(--n) - .6) 1 auto; min-width: 0; position: relative; display: grid; grid-template-rows: auto 12px auto; align-content: center; row-gap: 3px; }
+.stops .ch { overflow: hidden; display: flex; align-items: baseline; gap: 7px; padding-right: 14px; color: var(--text); text-decoration: none; font-size: 13.5px; font-weight: 600; line-height: 1.15; white-space: nowrap; transition: color .25s; }
+.stops .yr { font-family: var(--mono); font-size: 10px; font-weight: 450; color: var(--muted); letter-spacing: .02em; transition: color .25s; }
+.stops .ch:hover, .stops li.on .ch { color: var(--ink); }
+.stops li.on .yr { color: var(--laser); }
+.track { position: relative; height: 12px; }
+.track::before, .track .fill { content: ""; position: absolute; left: 0; top: 50%; height: 2px; margin-top: -1px; border-radius: 2px; }
+.track::before { right: 0; background: var(--line); }
+.track .fill { width: 0; background: var(--laser); transition: width .55s var(--spring); }
+.track a { position: absolute; top: 50%; left: calc(100% * var(--i, 0) / var(--n)); width: 9px; height: 9px; margin: -4.5px 0 0 0; border-radius: 50%; background: #fff; border: 1.5px solid #b9c1cd; transition: background .25s, border-color .25s, box-shadow .25s, transform .6s var(--spring); }
+.track a::after { content: ""; position: absolute; inset: -9px -7px; }   /* bigger hit area */
+.track a:nth-child(3) { --i: 1; } .track a:nth-child(4) { --i: 2; } .track a:nth-child(5) { --i: 3; }
+.track a:hover { border-color: var(--ink); transform: scale(1.25); }
+.track a.past { background: var(--laser); border-color: var(--laser); }
+.track a.on { background: var(--laser); border-color: var(--laser); box-shadow: 0 0 0 3px #ffe1db, 0 0 10px 2px rgba(228, 67, 43, .35); transform: scale(1.35); }
+.stops .proj { font-family: var(--mono); font-size: 10px; line-height: 1.2; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 12px; transition: color .25s; }
+.stops li.on .proj { color: var(--ink); }
+.stops .proj.swap { animation: projIn .45s var(--spring); }
+@keyframes projIn { from { opacity: 0; transform: translateY(5px); } }
 
 /* ---------- Hero ---------- */
 
@@ -359,11 +366,9 @@ html.slides body { overflow-x: hidden; }
 .slide { scroll-snap-align: start; }
 .arrive .spring { animation: springIn .95s var(--spring) both; animation-delay: calc(var(--i, 0) * 70ms); }
 @keyframes springIn { from { transform: translateY(46px) scale(.985); } to { transform: none; } }
-.stops a::before { transition: background .25s, border-color .25s, box-shadow .25s, transform .6s var(--spring); }
-.stops a.on::before { transform: scale(1.35); }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 1060px) {
+@media (max-width: 1240px) {
   .stops .yr { display: none; }
 }
 @media (max-width: 960px) {
@@ -380,6 +385,8 @@ html.slides body { overflow-x: hidden; }
   .rail-in { flex-wrap: wrap; height: auto; padding-block: 10px 8px; gap: 8px 12px; }
   .brand { flex: 1; }
   .stops { order: 3; flex-basis: 100%; }
+  .stops .proj { display: none; }
+  .stops li { grid-template-rows: auto 12px; flex: 0 0 auto; min-width: calc(54px + 30px * var(--n)); }
   .stats { grid-template-columns: minmax(0, 1fr); }
   .stats > div + div { border-left: 0; border-top: 1px solid var(--line); }
   .strip { gap: 10px; }
