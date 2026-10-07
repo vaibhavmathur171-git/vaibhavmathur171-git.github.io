@@ -286,27 +286,31 @@ function onScroll() {
     a.classList.toggle('on', on);
     if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
   });
-  // The timeline: chapters before this one are filled, this one fills up to the current slide.
+  // The timeline: every slide up to this one is lit; in the sidebar one laser line fills down to it.
+  const stopsEl = document.querySelector('.stops'), top0 = stopsEl.getBoundingClientRect().top;
+  const mid = t => { const r = t.getBoundingClientRect(); return r.top - top0 + r.height / 2 - 10; };
+  let fill = 0;
   chapters.forEach(li => {
-    const ticks = [...li.querySelectorAll('.track a')], n = ticks.length;
-    const idx = ticks.map(t => slidesAll.indexOf(document.getElementById(t.getAttribute('href').slice(1))));
-    const k = ticks.findIndex(t => t.getAttribute('href') === '#' + id);
-    const past = ai >= 0 && ai > idx[n - 1];
-    const on = k >= 0;
+    const ticks = [...li.querySelectorAll('.subs a')];
+    let on = false;
+    ticks.forEach(t => {
+      const si = slidesAll.indexOf(document.getElementById(t.getAttribute('href').slice(1)));
+      const here = t.getAttribute('href') === '#' + id;
+      t.classList.toggle('on', here);
+      t.classList.toggle('past', ai >= 0 && si < ai);
+      if (here) { on = true; t.setAttribute('aria-current', 'true'); fill = mid(t); }
+      else t.removeAttribute('aria-current');
+    });
     li.classList.toggle('on', on);
-    li.classList.toggle('done', past);
-    ticks.forEach((t, i) => { t.classList.toggle('on', i === k); t.classList.toggle('past', past || (on && i < k)); });
-    li.querySelector('.fill').style.width = past ? '100%' : on ? (100 * k / n) + '%' : '0%';
-    const proj = li.querySelector('.proj'), text = on ? ticks[k].dataset.name : proj.dataset.sum;
-    if (proj.textContent !== text) { proj.textContent = text; proj.classList.remove('swap'); void proj.offsetWidth; proj.classList.add('swap'); }
-    if (on) {   // keep the active chapter visible when the rail scrolls sideways (phones)
-      const rail = li.closest('.stops');
-      if (rail.scrollWidth > rail.clientWidth + 2) rail.scrollTo({ left: li.offsetLeft - 16, behavior: 'smooth' });
-    }
+    if (on && stopsEl.scrollWidth > stopsEl.clientWidth + 2)   // top bar on phones scrolls sideways
+      stopsEl.scrollTo({ left: li.offsetLeft - 16, behavior: 'smooth' });
   });
+  const last = [...document.querySelectorAll('.subs a')].pop();
+  if (last && ai > slidesAll.indexOf(document.getElementById(last.getAttribute('href').slice(1)))) fill = mid(last);
+  stopsEl.style.setProperty('--fill', Math.max(0, fill) + 'px');
 }
 addEventListener('scroll', onScroll, { passive: true });
-addEventListener('resize', onScroll);
+addEventListener('resize', () => { currentId = null; onScroll(); });
 onScroll();
 
 /* ---------- 3. Spatial dimming demo ---------- */
@@ -386,7 +390,7 @@ if (aliases[h]) document.getElementById(aliases[h])?.scrollIntoView();
    c) When a chapter arrives, its blocks spring up into place, staggered. */
 (() => {
   const html = document.documentElement;
-  const railH = () => (document.querySelector('.rail')?.offsetHeight || 0);
+  const railH = () => { const r = document.querySelector('.rail'); return !r || getComputedStyle(r).position === 'fixed' ? 0 : r.offsetHeight; };
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
   /* One spring drives all programmatic scrolling. It keeps its position and velocity,
      so a new target set mid-flight (a second swipe, a menu click) bends the motion
