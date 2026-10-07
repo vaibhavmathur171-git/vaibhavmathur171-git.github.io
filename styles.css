@@ -134,7 +134,13 @@ h4 { font-size: 18px; line-height: 1.35; font-weight: 600; letter-spacing: 0; }
 
 /* ---------- Hero ---------- */
 
-.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 4vw, 56px); align-items: center; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "id bench" "copy bench"; column-gap: clamp(28px, 4vw, 56px); row-gap: 20px; align-items: center; }
+.hero-id { grid-area: id; align-self: end; display: flex; align-items: center; gap: clamp(16px, 2vw, 22px); }
+.hero-id h1 { margin: 0; }
+.hero-id .label { display: block; margin-bottom: 4px; }
+.portrait { width: clamp(76px, 7.5vw, 104px); height: auto; aspect-ratio: 1; flex: none; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 4px #fff, 0 0 0 5px var(--line), 0 10px 26px -10px rgba(16, 24, 40, .35); }
+.hero-grid > .bench { grid-area: bench; }
+.hero-grid > .hero-copy { grid-area: copy; align-self: start; }
 .hero-copy { display: grid; gap: 18px; justify-items: start; }
 .hero h1 .hl { color: var(--laser); }
 .hero .lede { margin: 0; }
@@ -409,6 +415,7 @@ html.slides body { overflow-x: hidden; }
 }
 @media (max-width: 960px) {
   .hero-grid, .feature, .split, .contact-box { grid-template-columns: minmax(0, 1fr); }
+  .hero-grid { grid-template-areas: "id" "bench" "copy"; row-gap: 22px; }
   .cards, .cards.two, .beyond, .origin, .tech, .later, .featured-cards, .cad, .explore { grid-template-columns: minmax(0, 1fr); }
   .strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .fund { grid-template-columns: 96px minmax(0, 1fr); }
