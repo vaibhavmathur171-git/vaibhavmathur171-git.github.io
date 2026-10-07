@@ -447,6 +447,22 @@
 </main>
 
 <script src="main.js"></script>
+<!-- Visitor stats: GoatCounter (no cookies). Visit /#toggle-goatcounter once on your own browsers to stop counting yourself. -->
+<script>
+(function () {
+  var seen = {};
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      var id = e.target.id;
+      if (!e.isIntersecting || !id || seen[id] || !window.goatcounter || !window.goatcounter.count) return;
+      seen[id] = 1;
+      window.goatcounter.count({ path: 'slide-' + id, title: 'Viewed: ' + id, event: true });
+    });
+  }, { threshold: 0.6 });
+  document.querySelectorAll('section.slide[id]').forEach(function (s) { io.observe(s); });
+})();
+</script>
+<script data-goatcounter="https://vaibhavmathur.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <!--BODY-END-->
 </body>
 </html>
