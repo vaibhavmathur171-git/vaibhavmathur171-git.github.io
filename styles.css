@@ -409,6 +409,19 @@ html.slides body { overflow-x: hidden; }
 .arrive .spring { animation: springIn .95s var(--spring) both; animation-delay: calc(var(--i, 0) * 70ms); }
 @keyframes springIn { from { transform: translateY(46px) scale(.985); } to { transform: none; } }
 
+/* Optical tweezers illustration (IISc slide): the bead oscillates in the trap and the DNA stretches with it. */
+.twz { margin: 0; display: grid; gap: 8px; }
+@media (min-width: 961px) { .origin:has(.twz) { grid-template-columns: 170px minmax(0, 1fr) minmax(0, 1.3fr); } }
+.twz svg { width: 100%; height: auto; display: block; }
+.twz .cap { margin: 0; }
+.twz-campus { display: flex; align-items: center; gap: 12px; }
+.twz-campus img { width: 96px; height: 54px; object-fit: cover; border-radius: 8px; flex: none; }
+.twz-bead { animation: twzBead 1.3s ease-in-out infinite alternate; }
+.twz-dna { transform-origin: 104px 176px; transform-box: view-box; animation: twzDna 1.3s ease-in-out infinite alternate; }
+@keyframes twzBead { from { transform: translate(-3px, .6px); } to { transform: translate(3px, -.6px); } }
+@keyframes twzDna { from { transform: scaleX(.973); } to { transform: scaleX(1.027); } }
+@media (prefers-reduced-motion: reduce) { .twz-bead, .twz-dna { animation: none; } }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1100px) {
   .stops .yr { display: none; }
