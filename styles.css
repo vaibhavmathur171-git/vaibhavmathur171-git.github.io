@@ -723,3 +723,22 @@ html.drawer-open { overflow: hidden; }
   .rail-end { align-self: flex-start; }
   .rail-end .btn { align-self: auto; }
 }
+
+/* AR overview: what I worked across */
+.stack { list-style: none; margin: 0 0 clamp(16px, 3vh, 28px); padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line); }
+.stack li { display: grid; gap: 4px; align-content: start; padding: 14px 18px 4px 0; }
+.stack li + li { padding-left: 18px; border-left: 1px solid var(--line); }
+.stack b { font-size: 15.5px; color: var(--ink); font-weight: 650; }
+.stack span { font-size: 14px; line-height: 1.5; color: var(--text); }
+#ar-more .tcard .ph { aspect-ratio: 16 / 9; }
+.reads { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 6px !important; }
+.reads a { font-size: 14px; font-weight: 550; color: var(--link); text-decoration: none; }
+.reads a:hover { text-decoration: underline; }
+@media (max-width: 960px) {
+  .stack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stack li:nth-child(3) { padding-left: 0; border-left: 0; }
+}
+@media (max-width: 520px) {
+  .stack { grid-template-columns: minmax(0, 1fr); }
+  .stack li, .stack li + li { padding-left: 0; border-left: 0; }
+}
