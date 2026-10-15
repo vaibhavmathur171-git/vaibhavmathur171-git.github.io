@@ -742,3 +742,5 @@ html.drawer-open { overflow: hidden; }
   .stack { grid-template-columns: minmax(0, 1fr); }
   .stack li, .stack li + li { padding-left: 0; border-left: 0; }
 }
+.press.mini-press { margin-top: 0; padding: 10px 14px; gap: 2px; max-width: 420px; }
+.press.mini-press h4 { font-size: 15px; color: var(--link); }
